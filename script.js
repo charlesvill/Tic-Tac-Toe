@@ -1,45 +1,10 @@
-const Player = (team) => {
-    const turns = 0; 
-    const returnTurns = () => {
-        return turns;
-    }
-    const getTeam = () => {
-        if (team === "x"){
-            return 1;
-        }
-        else if (team === "o"){
-            return 0;
-        }
-    }
-
-    return {Player, getTeam, returnTurns};
-    
-}
-
-//maybe the players should exist inside of the module for gameloop
-// const player1 = Player(prompt("Player 1, what player you rooting for?"));
-// const player2 = Player(prompt("What player you rooting for, Player 2?"));
-
-// console.log(player1.getTeam());
-// console.log(player2.getTeam());
-
-const gameboard = (()=> {
-    
-    
-    const board = document.querySelector(".board")
-
-    
-    
-
-})();
-
-
 const gameLoop = (()=> {
     //call gameboard to build
        
     let turn = 0; 
     const boardArr = [];
     const fields = document.querySelectorAll(".square");
+    const fieldNodeList = [0,0,0,0,0,0,0,0,0];
     const updateBoardArr = (dataIndex)=>{
     let repeat = false;
     //check for duplicate clicks
@@ -53,10 +18,9 @@ const gameLoop = (()=> {
             else{
                 boardArr[dataIndex] = 'o';
             }
-            
-           
             turn++;
             //call to change display
+            DisplayManager.UpdatePlayerChoice(dataIndex,boardArr[dataIndex]);
             //check # turns and call checkwin
             if(turn > 4 ){ 
                 CheckWin.assessArr(boardArr, turn);
@@ -66,20 +30,14 @@ const gameLoop = (()=> {
             console.log("repeat was detected, returning now.");
             return boardArr;
         }
-        
-        console.log(boardArr);
     }
     
     fields.forEach(element =>{
         element.addEventListener("click", (e)=> {
             //send event information to map to what square was pressed
             const dataIndex = Number(e.currentTarget.getAttribute("data-index"));
-            console.log(`data index is: ${dataIndex}`);
+            fieldNodeList.splice(dataIndex, 0, e.currentTarget);
             mapBoardChoice(dataIndex);
-            //check whos turn it is and mark choice
-            //add player choice to array
-            //add player turn 
-            
         })
     })
     const mapBoardChoice = (dataIndex) => {
@@ -87,11 +45,12 @@ const gameLoop = (()=> {
             return;
         }
         updateBoardArr(dataIndex);
-        
-        
+    }
+    const returnNodeList = () => {
+        return fieldNodeList;
     }
 
-    
+    return{returnNodeList}
 })();
 
 const CheckWin = (()=> {
@@ -100,6 +59,7 @@ const CheckWin = (()=> {
     let oCount = 0; 
     const x = 'x';
     const o =  'o';
+    const maxTurns = 8;
     let winner = false;
     const winningPatterns = [
         [0,1,2], 
@@ -128,6 +88,7 @@ const CheckWin = (()=> {
                     console.log("x wins");
                     //xwins send method to trigger win
                     //update display
+                    DisplayManager.displayWinner("Player 1 wins!");
                     winner = true;
                     return;
                 }
@@ -135,17 +96,17 @@ const CheckWin = (()=> {
                     //xwins send method to trigger win
                     console.log("o wins");
                     //update display for owin
+                    DisplayManager.displayWinner("Player 2 wins!");
                     winner = true;
                     return;
                 }
             }
-            
             //use winning patterns to check the location of the boardArr and note if there are repeating 0s or xs 
             
         }
-        if(!winner && turn > 7){
-            console.log("There was a tie!");
+        if(!winner && turn > maxTurns){
             //trigger tie
+            DisplayManager.displayWinner("It was a tie!");
             //update display
         }
         else{
@@ -154,4 +115,27 @@ const CheckWin = (()=> {
     }
 
     return{assessArr: assessArr}
+})();
+
+const DisplayManager = (()=>{
+    const winText = document.querySelector(".winText");
+    const restartBtn = document.querySelector("button");
+    const nodeList = gameLoop.returnNodeList();
+    restartBtn.addEventListener("click", ()=>{
+        window.location.reload();
+    })
+    const UpdatePlayerChoice = (dataIndex, string) =>{
+        // console.log(nodeList[dataIndex]);
+        const span = nodeList[dataIndex].querySelector('span');
+        if(span){
+            span.textContent = string;
+        }
+        else {
+            console.log("no <span> element found");
+        }
+    }
+    const displayWinner = (string) => {
+        winText.textContent = string; 
+    }
+    return{UpdatePlayerChoice, displayWinner}
 })();
