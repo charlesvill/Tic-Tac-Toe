@@ -5,6 +5,7 @@ const gameLoop = (()=> {
     const boardArr = [];
     const fields = document.querySelectorAll(".square");
     const fieldNodeList = [0,0,0,0,0,0,0,0,0];
+    alert("X is Player 1");
     const updateBoardArr = (dataIndex)=>{
     let repeat = false;
     //check for duplicate clicks
@@ -12,6 +13,7 @@ const gameLoop = (()=> {
         if(turn < 9 && boardArr[dataIndex] === undefined){ 
             //generate the pair of position and player for each turn (index) in boardArr
             repeat = false;
+            
             if(turn%2 === 0){
                 boardArr[dataIndex] = 'x';
             }
@@ -31,14 +33,14 @@ const gameLoop = (()=> {
             return boardArr;
         }
     }
-    
+    function AttachListener(e) {
+        //send event information to map to what square was pressed
+        const dataIndex = Number(e.currentTarget.getAttribute("data-index"));
+        fieldNodeList.splice(dataIndex, 0, e.currentTarget);
+        mapBoardChoice(dataIndex);
+    }
     fields.forEach(element =>{
-        element.addEventListener("click", (e)=> {
-            //send event information to map to what square was pressed
-            const dataIndex = Number(e.currentTarget.getAttribute("data-index"));
-            fieldNodeList.splice(dataIndex, 0, e.currentTarget);
-            mapBoardChoice(dataIndex);
-        })
+        element.addEventListener("click", AttachListener , true);
     })
     const mapBoardChoice = (dataIndex) => {
         if(dataIndex === null){
@@ -49,8 +51,13 @@ const gameLoop = (()=> {
     const returnNodeList = () => {
         return fieldNodeList;
     }
+    const EndGame = ()=>{
+        fields.forEach(element =>{
+            element.removeEventListener("click",AttachListener, true);
+        })
+    }
 
-    return{returnNodeList}
+    return{returnNodeList, EndGame}
 })();
 
 const CheckWin = (()=> {
@@ -90,6 +97,7 @@ const CheckWin = (()=> {
                     //update display
                     DisplayManager.displayWinner("Player 1 wins!");
                     winner = true;
+                    gameLoop.EndGame(); 
                     return;
                 }
                 else if(oCount === 3){
@@ -98,6 +106,7 @@ const CheckWin = (()=> {
                     //update display for owin
                     DisplayManager.displayWinner("Player 2 wins!");
                     winner = true;
+                    gameLoop.EndGame();
                     return;
                 }
             }
@@ -107,13 +116,16 @@ const CheckWin = (()=> {
         if(!winner && turn > maxTurns){
             //trigger tie
             DisplayManager.displayWinner("It was a tie!");
-            //update display
+            gameLoop.EndGame();
+            return;
+            
         }
         else{
             console.log("keep playing");
         }
     }
 
+    
     return{assessArr: assessArr}
 })();
 

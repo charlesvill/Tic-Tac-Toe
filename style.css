@@ -59,20 +59,40 @@ body{
     background-color: #B5C99A;
     height: 20vh;
     width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+p{
+    padding:3rem;
+    font-size: 4rem;
 }
 .gameCont{
     display: flex;
-    align-content: center;
+    align-items: center;
     justify-content: center;
+    flex-direction: column;
+}
+.gameCont > button {
+    padding: 1rem;
+    font-size: 2rem;
+    font-family: 'Courier New', Courier, monospace;
+    border-radius: 10px;
+    border-style: 2px solid #862B0D;
+    background-color: #B5C99A;
+    text-align: center;
+    margin: 0 30vw;
 
 }
-
+.gameCont > button:hover{
+    background-color: #B5C99AAf;
+}
 .gameBoard{
     background-color: #862B0D;
     display:grid;
     grid-template:1fr 1fr 1fr/ 1fr 1fr 1fr;
     border:none;
-    margin: 10vh 30vw;
+    margin: 5vh 40vw;
     height: 30vw;
     width: 30vw;
     height: 30vw;
@@ -89,6 +109,6 @@ body{
 }
 span{
     align-self: center;
-    font-size: x-large;
+    font-size: 10rem;
     font-weight: bold;
 }
